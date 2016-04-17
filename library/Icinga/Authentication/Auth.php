@@ -1,5 +1,5 @@
 <?php
-/* Icinga Web 2 | (c) 2013-2015 Icinga Development Team | GPLv2+ */
+/* Icinga Web 2 | (c) 2013 Icinga Development Team | GPLv2+ */
 
 namespace Icinga\Authentication;
 
@@ -135,6 +135,8 @@ class Auth
         } else {
             $preferences = new Preferences();
         }
+        // TODO(el): Quick-fix for #10957. Only reload CSS if the theme changed.
+        $this->getResponse()->setReloadCss(true);
         $user->setPreferences($preferences);
         $groups = $user->getGroups();
         foreach (Config::app('groups') as $name => $config) {
@@ -158,9 +160,7 @@ class Auth
         }
         $user->setGroups($groups);
         $admissionLoader = new AdmissionLoader();
-        list($permissions, $restrictions) = $admissionLoader->getPermissionsAndRestrictions($user);
-        $user->setPermissions($permissions);
-        $user->setRestrictions($restrictions);
+        $admissionLoader->applyRoles($user);
         $this->user = $user;
         if ($persist) {
             $this->persistCurrentUser();
@@ -240,9 +240,10 @@ class Auth
     public function authenticateFromSession()
     {
         $this->user = Session::getSession()->get('user');
-        if ($this->user !== null && $this->user->isExternalUser() === true) {
+        if ($this->user !== null && $this->user->isExternalUser()) {
             list($originUsername, $field) = $this->user->getExternalUserInformation();
-            if (! array_key_exists($field, $_SERVER) || $_SERVER[$field] !== $originUsername) {
+            $username = ExternalBackend::getRemoteUser($field);
+            if ($username === null || $username !== $originUsername) {
                 $this->removeAuthorization();
             }
         }
@@ -268,7 +269,7 @@ class Auth
     }
 
     /**
-     * Attempt to authenticate a user using HTTP authentication
+     * Attempt to authenticate a user using HTTP authentication on API requests only
      *
      * Supports only the Basic HTTP authentication scheme. XHR will be ignored.
      *
@@ -276,18 +277,17 @@ class Auth
      */
     protected function authHttp()
     {
-        if ($this->getRequest()->isXmlHttpRequest()) {
+        $request = $this->getRequest();
+        if ($request->isXmlHttpRequest() || ! $request->isApiRequest()) {
             return false;
         }
-        if (($header = $this->getRequest()->getHeader('Authorization')) === false) {
-            return false;
-        }
+        $header = $request->getHeader('Authorization');
         if (empty($header)) {
             $this->challengeHttp();
         }
         list($scheme) = explode(' ', $header, 2);
         if ($scheme !== 'Basic') {
-            $this->challengeHttp();
+            return false;
         }
         $authorization = substr($header, strlen('Basic '));
         $credentials = base64_decode($authorization);

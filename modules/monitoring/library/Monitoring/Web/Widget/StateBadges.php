@@ -1,5 +1,5 @@
 <?php
-/* Icinga Web 2 | (c) 2013-2015 Icinga Development Team | GPLv2+ */
+/* Icinga Web 2 | (c) 2015 Icinga Development Team | GPLv2+ */
 
 namespace Icinga\Module\Monitoring\Web\Widget;
 
@@ -257,6 +257,7 @@ class StateBadges extends AbstractWidget
             $groupItem = new NavigationItem(
                 uniqid(),
                 array(
+                    'cssClass'  => 'state-badge-group',
                     'label'     => '',
                     'priority'  => $this->priority++
                 )

@@ -1,15 +1,18 @@
 <?php
-/* Icinga Web 2 | (c) 2013-2015 Icinga Development Team | GPLv2+ */
+/* Icinga Web 2 | (c) 2013 Icinga Development Team | GPLv2+ */
 
 namespace Icinga\Module\Monitoring\Object;
 
+use stdClass;
 use InvalidArgumentException;
+use Icinga\Authentication\Auth;
 use Icinga\Application\Config;
 use Icinga\Data\Filter\Filter;
 use Icinga\Data\Filterable;
 use Icinga\Exception\InvalidPropertyException;
 use Icinga\Exception\ProgrammingError;
 use Icinga\Module\Monitoring\Backend\MonitoringBackend;
+use Icinga\Util\GlobFilter;
 use Icinga\Web\UrlParams;
 
 /**
@@ -145,6 +148,13 @@ abstract class MonitoredObject implements Filterable
      * @var object
      */
     protected $stats;
+
+    /**
+     * The properties to hide from the user
+     *
+     * @var GlobFilter
+     */
+    protected $blacklistedProperties = null;
 
     /**
      * Create a monitored object, i.e. host or service
@@ -456,16 +466,53 @@ abstract class MonitoredObject implements Filterable
             $customvars = $this->hostVariables;
         }
 
-        $this->customvars = array();
-        foreach ($customvars as $name => $value) {
-            if ($blacklistPattern && preg_match($blacklistPattern, $name)) {
-                $this->customvars[$name] = '***';
-            } else {
-                $this->customvars[$name] = $value;
-            }
-        }
+        $this->customvars = $customvars;
+        $this->hideBlacklistedProperties();
+        $this->customvars = $this->obfuscateCustomVars($this->customvars, $blacklistPattern);
 
         return $this;
+    }
+
+    /**
+     * Obfuscate custom variables recursively
+     *
+     * @param stdClass|array    $customvars         The custom variables to obfuscate
+     * @param string            $blacklistPattern   Which custom variables to obfuscate
+     *
+     * @return stdClass|array                       The obfuscated custom variables
+     */
+    protected function obfuscateCustomVars($customvars, $blacklistPattern)
+    {
+        $obfuscatedCustomVars = array();
+        foreach ($customvars as $name => $value) {
+            if ($blacklistPattern && preg_match($blacklistPattern, $name)) {
+                $obfuscatedCustomVars[$name] = '***';
+            } else {
+                $obfuscatedCustomVars[$name] = $value instanceof stdClass || is_array($value)
+                    ? $this->obfuscateCustomVars($value, $blacklistPattern)
+                    : $value;
+            }
+        }
+        return $customvars instanceof stdClass ? (object) $obfuscatedCustomVars : $obfuscatedCustomVars;
+    }
+
+    /**
+     * Hide all blacklisted properties from the user as restricted by monitoring/blacklist/properties
+     *
+     * Currently this only affects the custom variables
+     */
+    protected function hideBlacklistedProperties()
+    {
+        if ($this->blacklistedProperties === null) {
+            $this->blacklistedProperties = new GlobFilter(
+                Auth::getInstance()->getRestrictions('monitoring/blacklist/properties')
+            );
+        }
+
+        $allProperties = $this->blacklistedProperties->removeMatching(
+            array($this->type => array('vars' => $this->customvars))
+        );
+        $this->customvars = isset($allProperties[$this->type]['vars']) ? $allProperties[$this->type]['vars'] : array();
     }
 
     /**

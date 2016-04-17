@@ -1,5 +1,5 @@
 <?php
-/* Icinga Web 2 | (c) 2013-2015 Icinga Development Team | GPLv2+ */
+/* Icinga Web 2 | (c) 2013 Icinga Development Team | GPLv2+ */
 
 namespace Icinga\Module\Monitoring\Clicommands;
 
@@ -55,6 +55,9 @@ class ListCommand extends Command
             $query->limit($limit, $this->params->shift('offset'));
         }
         foreach ($this->params->getParams() as $col => $filter) {
+            if (strtolower($col) === 'problems') {
+                $col = 'service_problem';
+            }
             $query->where($col, $filter);
         }
         // $query->applyFilters($this->params->getParams());

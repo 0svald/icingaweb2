@@ -18,11 +18,13 @@ end
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.network "forwarded_port", guest: 80, host: 8080,
     auto_correct: true
+  config.vm.network "forwarded_port", guest: 443, host: 8443,
+    auto_correct: true
 
   config.vm.provision :shell, :path => ".puppet/manifests/puppet.sh"
 
   config.vm.provider :parallels do |p, override|
-    override.vm.box = "parallels/centos-7.1"
+    override.vm.box = "parallels/centos-7.2"
 
     p.name = "Icinga Web 2 Development"
 
@@ -36,12 +38,19 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     p.cpus = 2
   end
 
-  config.vm.provider :virtualbox do |v, override|
+  config.vm.provider :vmware_workstation do |v, override|
+    override.vm.box = "bento/centos-7.1"
+
+    v.vmx["memsize"] = "1024"
+    v.vmx["numvcpus"] = "1"
+  end
+
+  config.vm.provider :virtualbox do |vb, override|
     override.vm.box = "centos-71-x64-vbox"
     override.vm.box_url = "http://boxes.icinga.org/centos-71-x64-vbox.box"
 
-    v.customize ["modifyvm", :id, "--memory", "1024"]
-    v.customize ["modifyvm", :id, "--cpus", "2"]
+    vb.customize ["modifyvm", :id, "--memory", "1024"]
+    vb.customize ["modifyvm", :id, "--cpus", "2"]
   end
 
   config.vm.provision :puppet do |puppet|

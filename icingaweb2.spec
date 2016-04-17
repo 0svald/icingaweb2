@@ -1,9 +1,9 @@
-# Icinga Web 2 | (c) 2013-2015 Icinga Development Team | GPLv2+
+# Icinga Web 2 | (c) 2013-2016 Icinga Development Team | GPLv2+
 
 %define revision 1
 
 Name:           icingaweb2
-Version:        2.1.2
+Version:        2.3.0
 Release:        %{revision}%{?dist}
 Summary:        Icinga Web 2
 Group:          Applications/System
@@ -106,7 +106,7 @@ Icinga CLI
 
 
 %package vendor-dompdf
-Version:    0.6.1
+Version:    0.6.2
 Release:    1%{?dist}
 Summary:    Icinga Web 2 vendor library dompdf
 Group:      Development/Libraries
@@ -165,6 +165,18 @@ Requires:   %{php} >= 5.3.0
 Icinga Web 2 vendor library Parsedown
 
 
+%package vendor-Zend
+Version:    1.12.15
+Release:    1%{?dist}
+Summary:    Icinga Web 2 vendor library Zend Framework
+Group:      Development/Libraries
+License:    BSD
+Requires:   %{php} >= 5.3.0
+
+%description vendor-Zend
+Icinga Web 2 vendor library Zend
+
+
 %prep
 %setup -q
 
@@ -175,10 +187,10 @@ rm -rf %{buildroot}
 mkdir -p %{buildroot}/{%{basedir}/{modules,library/vendor,public},%{bindir},%{configdir}/modules,%{logdir},%{phpdir},%{wwwconfigdir},%{_sysconfdir}/bash_completion.d,%{docsdir}}
 cp -prv application doc %{buildroot}/%{basedir}
 cp -pv etc/bash_completion.d/icingacli %{buildroot}/%{_sysconfdir}/bash_completion.d/icingacli
-cp -prv modules/{monitoring,iframe,setup,doc,translation} %{buildroot}/%{basedir}/modules
+cp -prv modules/{monitoring,setup,doc,translation} %{buildroot}/%{basedir}/modules
 cp -prv library/Icinga %{buildroot}/%{phpdir}
-cp -prv library/vendor/{dompdf,HTMLPurifier*,JShrink,lessphp,Parsedown} %{buildroot}/%{basedir}/library/vendor
-cp -prv public/{css,img,js,error_norewrite.html} %{buildroot}/%{basedir}/public
+cp -prv library/vendor/{dompdf,HTMLPurifier*,JShrink,lessphp,Parsedown,Zend} %{buildroot}/%{basedir}/library/vendor
+cp -prv public/{css,font,img,js,error_norewrite.html} %{buildroot}/%{basedir}/public
 cp -pv packages/files/apache/icingaweb2.conf %{buildroot}/%{wwwconfigdir}/icingaweb2.conf
 cp -pv packages/files/bin/icingacli %{buildroot}/%{bindir}
 cp -pv packages/files/public/index.php %{buildroot}/%{basedir}/public
@@ -267,3 +279,8 @@ exit 0
 %files vendor-Parsedown
 %defattr(-,root,root)
 %{basedir}/library/vendor/Parsedown
+
+
+%files vendor-Zend
+%defattr(-,root,root)
+%{basedir}/library/vendor/Zend
