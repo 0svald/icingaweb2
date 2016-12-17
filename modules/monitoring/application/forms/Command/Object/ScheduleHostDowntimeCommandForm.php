@@ -3,6 +3,7 @@
 
 namespace Icinga\Module\Monitoring\Forms\Command\Object;
 
+use DateTime;
 use Icinga\Module\Monitoring\Command\Object\PropagateHostDowntimeCommand;
 use Icinga\Module\Monitoring\Command\Object\ScheduleHostDowntimeCommand;
 use Icinga\Module\Monitoring\Command\Object\ScheduleServiceDowntimeCommand;
@@ -28,12 +29,13 @@ class ScheduleHostDowntimeCommandForm extends ScheduleServiceDowntimeCommandForm
                 'description'   => $this->translate(
                     'Schedule downtime for all services on the hosts and the hosts themselves.'
                 ),
-                'label'         => $this->translate('All Services'),
-                'value'         => false
+                'label'         => $this->translate('All Services')
             )
         );
 
-        if (! $this->getBackend()->isIcinga2()) {
+        if (! $this->getBackend()->isIcinga2()
+            || version_compare($this->getBackend()->getProgramVersion(), '2.6.0', '>=')
+        ) {
             $this->addElement(
                 'select',
                 'child_hosts',
@@ -61,6 +63,22 @@ class ScheduleHostDowntimeCommandForm extends ScheduleServiceDowntimeCommandForm
      */
     public function onSuccess()
     {
+        $end = $this->getValue('end')->getTimestamp();
+        if ($end <= $this->getValue('start')->getTimestamp()) {
+            $endElement = $this->_elements['end'];
+            $endElement->setValue($endElement->getValue()->format($endElement->getFormat()));
+            $endElement->addError($this->translate('The end time must be greater than the start time'));
+            return false;
+        }
+
+        $now = new DateTime;
+        if ($end <= $now->getTimestamp()) {
+            $endElement = $this->_elements['end'];
+            $endElement->setValue($endElement->getValue()->format($endElement->getFormat()));
+            $endElement->addError($this->translate('A downtime must not be in the past'));
+            return false;
+        }
+
         foreach ($this->objects as $object) {
             /** @var \Icinga\Module\Monitoring\Object\Host $object */
             if (($childHostsEl = $this->getElement('child_hosts')) !== null) {

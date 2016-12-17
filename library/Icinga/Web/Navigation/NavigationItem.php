@@ -7,6 +7,7 @@ use Exception;
 use InvalidArgumentException;
 use IteratorAggregate;
 use Icinga\Application\Icinga;
+use Icinga\Application\Logger;
 use Icinga\Exception\IcingaException;
 use Icinga\Exception\ProgrammingError;
 use Icinga\Web\Navigation\Renderer\NavigationItemRenderer;
@@ -339,7 +340,7 @@ class NavigationItem implements IteratorAggregate
      */
     public function hasChildren()
     {
-        return !$this->getChildren()->isEmpty();
+        return ! $this->getChildren()->isEmpty();
     }
 
     /**
@@ -790,7 +791,7 @@ class NavigationItem implements IteratorAggregate
     public function getRender()
     {
         if ($this->render === null) {
-            return true;
+            return $this->getUrl() !== null;
         }
 
         return $this->render;
@@ -815,7 +816,20 @@ class NavigationItem implements IteratorAggregate
      */
     public function render()
     {
-        return $this->getRenderer()->setItem($this)->render();
+        try {
+            return $this->getRenderer()->setItem($this)->render();
+        } catch (Exception $e) {
+            Logger::error(
+                'Could not invoke custom navigation item renderer. %s in %s:%d with message: %s',
+                get_class($e),
+                $e->getFile(),
+                $e->getLine(),
+                $e->getMessage()
+            );
+
+            $renderer = new NavigationItemRenderer();
+            return $renderer->render($this);
+        }
     }
 
     /**

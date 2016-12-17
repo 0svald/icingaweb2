@@ -323,11 +323,12 @@ class FilterEditor extends AbstractWidget
                 if ($request->get('cancel') === 'Cancel') {
                     $this->redirectNow($this->preservedUrl()->without('modifyFilter'));
                 }
-
-                $filter = $this->applyChanges($request->getPost());
-                $url = $this->url()->setQueryString($filter->toQueryString())->addParams($preserve);
-                $url->getParams()->add('modifyFilter');
-                $this->redirectNow($url);
+                if ($request->get('formUID') === 'FilterEditor') {
+                    $filter = $this->applyChanges($request->getPost());
+                    $url = $this->url()->setQueryString($filter->toQueryString())->addParams($preserve);
+                    $url->getParams()->add('modifyFilter');
+                    $this->redirectNow($url);
+                }
             }
             $this->url()->getParams()->add('modifyFilter');
         }
@@ -734,8 +735,10 @@ class FilterEditor extends AbstractWidget
 
     public function renderSearch()
     {
+        $preservedUrl = $this->preservedUrl();
+
         $html = ' <form method="post" class="search inline" action="'
-              . $this->preservedUrl()
+              . $preservedUrl
               . '"><input type="text" name="q" style="width: 8em" class="search" value="" placeholder="'
               . t('Search...')
               . '" /></form>';
@@ -748,9 +751,10 @@ class FilterEditor extends AbstractWidget
                 $title .= ': ' . $this->view()->escape($this->filter);
             }
         }
+
         return $html
             . '<a href="'
-            . $this->preservedUrl()->with('modifyFilter', true)
+            . $preservedUrl->with('modifyFilter', ! $preservedUrl->getParam('modifyFilter'))
             . '" aria-label="'
             . $title
             . '" title="'
@@ -780,6 +784,7 @@ class FilterEditor extends AbstractWidget
             . '<input type="submit" name="submit" value="Apply" />'
             . '<input type="submit" name="cancel" value="Cancel" />'
             . '</div>'
+            . '<input type="hidden" name="formUID" value="FilterEditor">'
             . '</form>'
             . '</div>';
     }

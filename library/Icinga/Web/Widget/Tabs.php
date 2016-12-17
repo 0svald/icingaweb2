@@ -49,7 +49,7 @@ EOT;
      * @var string
      */
     private $closeTpl = <<< 'EOT'
-<li class="dropdown" style="float: right;">
+<li style="float: right;">
   <a href="#" title="{TITLE}" aria-label="{TITLE}" class="close-container-control">
     <i aria-hidden="true" class="icon-cancel"></i>
   </a>
@@ -249,7 +249,7 @@ EOT;
         if ($this->has($name)) {
             unset($this->tabs[$name]);
             if (($dropdownIndex = array_search($name, $this->dropdownTabs, true)) !== false) {
-                array_splice($this->dropdownTabs, $dropdownIndex, 2);
+                array_splice($this->dropdownTabs, $dropdownIndex, 1);
             }
         }
 
@@ -315,7 +315,7 @@ EOT;
 
     private function renderRefreshTab()
     {
-        $url = Icinga::app()->getRequest()->getUrl();
+        $url = Url::fromRequest();
         $tab = $this->get($this->getActiveName());
 
         if ($tab !== null) {
