@@ -38,6 +38,10 @@ class HostnotificationQuery extends IdoQuery
         'notifications' => array(
             'host_name'                 => 'ho.name1',
             'notification_output'       => 'hn.output',
+<<<<<<< HEAD
+=======
+            'notification_reason'       => 'hn.notification_reason',
+>>>>>>> upstream/master
             'notification_state'        => 'hn.state',
             'notification_timestamp'    => 'UNIX_TIMESTAMP(hn.start_time)',
             'object_type'               => '(\'host\')'
@@ -206,8 +210,12 @@ class HostnotificationQuery extends IdoQuery
     {
         $group = array();
 
+<<<<<<< HEAD
         if (
             $this->hasJoinedVirtualTable('history')
+=======
+        if ($this->hasJoinedVirtualTable('history')
+>>>>>>> upstream/master
             || $this->hasJoinedVirtualTable('services')
             || $this->hasJoinedVirtualTable('hostgroups')
         ) {

@@ -25,6 +25,10 @@ class NotificationQuery extends IdoQuery
             'instance_name'                 => 'n.instance_name',
             'notification_contact_name'     => 'n.notification_contact_name',
             'notification_output'           => 'n.notification_output',
+<<<<<<< HEAD
+=======
+            'notification_reason'           => 'n.notification_reason',
+>>>>>>> upstream/master
             'notification_state'            => 'n.notification_state',
             'notification_timestamp'        => 'n.notification_timestamp'
         ),

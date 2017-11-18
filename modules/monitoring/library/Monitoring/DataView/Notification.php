@@ -15,6 +15,10 @@ class Notification extends DataView
             'host_name',
             'notification_contact_name',
             'notification_output',
+<<<<<<< HEAD
+=======
+            'notification_reason',
+>>>>>>> upstream/master
             'notification_state',
             'notification_timestamp',
             'object_type',

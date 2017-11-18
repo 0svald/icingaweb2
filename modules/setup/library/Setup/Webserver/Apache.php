@@ -22,6 +22,8 @@ Alias {urlPath} "{documentRoot}"
     Options SymLinksIfOwnerMatch
     AllowOverride None
 
+    DirectoryIndex index.php
+
     <IfModule mod_authz_core.c>
         # Apache 2.4
         <RequireAll>
@@ -51,10 +53,16 @@ Alias {urlPath} "{documentRoot}"
 
     <IfModule !mod_rewrite.c>
         DirectoryIndex error_norewrite.html
-        ErrorDocument 404 /error_norewrite.html
+        ErrorDocument 404 {urlPath}/error_norewrite.html
     </IfModule>
+    
+    # forwarding PHP requests to FPM
+    # remove comments if you want to use FPM
+    #<FilesMatch "\.php$">
+    #    SetHandler "proxy:fcgi://127.0.0.1:9000"
+    #    ErrorDocument 503 {urlPath}/error_unavailable.html
+    #</FilesMatch>
 </Directory>
 EOD;
-
     }
 }

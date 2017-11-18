@@ -90,8 +90,7 @@ class DocParser
                 return null;
             }
             $headerStyle = static::HEADER_ATX;
-        } elseif (
-            $nextLine
+        } elseif ($nextLine
             && ($nextLine[0] === '=' || $nextLine[0] === '-')
             && preg_match('/^[=-]+\s*$/', $nextLine, $match) === 1
         ) {
@@ -110,7 +109,7 @@ class DocParser
         if ($header === null) {
             return null;
         }
-        if ($header[0] === '<'
+        if (strpos($header, '<') !== false
             && preg_match('#(?:<(?P<tag>a|span) (?:id|name)="(?P<id>.+)"></(?P=tag)>)\s*#u', $header, $match)
         ) {
             $header = str_replace($match[0], '', $header);

@@ -47,7 +47,7 @@ class NavigationItemForm extends Form
         );
 
         $this->addElement(
-            'text',
+            'textarea',
             'url',
             array(
                 'allowEmpty'    => true,
@@ -62,7 +62,11 @@ class NavigationItemForm extends Form
                         'Callback',
                         false,
                         array(
+<<<<<<< HEAD
                             'callback' => function($url) {
+=======
+                            'callback' => function ($url) {
+>>>>>>> upstream/master
                                 // Matches if the given url contains obviously
                                 // a username but not any protocol identifier
                                 return !preg_match('#^((?=[^/@]).)+@.*$#', $url);
@@ -97,7 +101,10 @@ class NavigationItemForm extends Form
     public function getValues($suppressArrayNotation = false)
     {
         $values = parent::getValues($suppressArrayNotation);
-        if (isset($values['url']) && $values['url']) {
+        // The regex here specifically matches the port-macro as it's the only one preventing Url::fromPath() from
+        // successfully parsing the given url. Any other macro such as for the scheme or host simply gets identified
+        // as path which is just fine in this case.
+        if (isset($values['url']) && $values['url'] && !preg_match('~://.+:(\$.+\$)~', $values['url'])) {
             $url = Url::fromPath($values['url']);
             if ($url->getBasePath() === $this->getRequest()->getBasePath()) {
                 $values['url'] = $url->getRelativeUrl();

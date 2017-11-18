@@ -100,8 +100,7 @@ class UserBackendConfigForm extends ConfigForm
      */
     public function getBackendForm($type)
     {
-        switch ($type)
-        {
+        switch ($type) {
             case 'db':
                 $form = new DbBackendForm();
                 $form->setResources(isset($this->resources['db']) ? $this->resources['db'] : array());
@@ -391,6 +390,10 @@ class UserBackendConfigForm extends ConfigForm
      */
     public function isValidPartial(array $formData)
     {
+        if (! parent::isValidPartial($formData)) {
+            return false;
+        }
+
         if ($this->getElement('backend_validation')->isChecked() && parent::isValid($formData)) {
             $inspection = static::inspectUserBackend($this);
             if ($inspection !== null) {

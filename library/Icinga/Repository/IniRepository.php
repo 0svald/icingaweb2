@@ -302,7 +302,9 @@ abstract class IniRepository extends Repository implements Extensible, Updatable
             $newConfig = clone $config;
             foreach ($newData as $column => $value) {
                 if ($column === $keyColumn) {
-                    $newSection = $value;
+                    if ($value !== $config->get($keyColumn)) {
+                        $newSection = $value;
+                    }
                 } else {
                     $newConfig->$column = $value;
                 }
@@ -403,7 +405,11 @@ abstract class IniRepository extends Repository implements Extensible, Updatable
      *
      * @throws  ProgrammingError    In case no valid section name is available
      */
+<<<<<<< HEAD
     protected function extractSectionName( & $config, $keyColumn)
+=======
+    protected function extractSectionName(& $config, $keyColumn)
+>>>>>>> upstream/master
     {
         if (! is_array($config) && !$config instanceof ConfigObject) {
             throw new ProgrammingError('$config is neither an array nor a ConfigObject');

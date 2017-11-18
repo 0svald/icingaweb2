@@ -13,7 +13,11 @@ use Zend_View_Helper_PluginOutput;
  *
  * Plugin output renderer must preserve the first character after a comma.
  *
+<<<<<<< HEAD
  * @see https://dev.icinga.org/issues/11728
+=======
+ * @see https://dev.icinga.com/issues/11728
+>>>>>>> upstream/master
  */
 class Bug11728Test extends BaseTestCase
 {

@@ -37,7 +37,15 @@ class Pdf
         $layout->content = $controller->getResponse();
         $html = $layout->render();
         $imgDir = Url::fromPath('img');
+<<<<<<< HEAD
         $html = preg_replace('~src="' . $imgDir . '/~', 'src="' . Icinga::app()->getBootstrapDirectory() . '/img/', $html);
+=======
+        $html = preg_replace(
+            '~src="' . $imgDir . '/~',
+            'src="' . Icinga::app()->getBootstrapDirectory() . '/img/',
+            $html
+        );
+>>>>>>> upstream/master
         $options = new Options();
         $options->set('defaultPaperSize', 'A4');
         $dompdf = new Dompdf($options);

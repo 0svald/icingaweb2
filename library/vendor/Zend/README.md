@@ -1,6 +1,10 @@
 # icingaweb2-vendor-zf1
 
+<<<<<<< HEAD
 icingaweb2-vendor-zf1 is [Icinga Web 2](https://www.icinga.org/products/icinga-web-2/)'s fork of
+=======
+icingaweb2-vendor-zf1 is [Icinga Web 2](https://www.icinga.com/products/icinga-web-2/)'s fork of
+>>>>>>> upstream/master
 [Zend Framework](https://framework.zend.com/) 1 which is
 [end-of-life](https://framework.zend.com/blog/2016-06-28-zf1-eol.html) since Sep 28, 2016.
 We've reduced the library to the minimum required by Icinga Web 2 and its modules.

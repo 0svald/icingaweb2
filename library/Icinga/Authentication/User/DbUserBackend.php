@@ -225,9 +225,7 @@ class DbUserBackend extends DbRepository implements UserBackendInterface, Inspec
     {
         try {
             $passwordHash = $this->getPasswordHash($user->getUsername());
-            $passwordSalt = $this->getSalt($passwordHash);
-            $hashToCompare = $this->hashPassword($password, $passwordSalt);
-            return $hashToCompare === $passwordHash;
+            return crypt($password, $passwordHash) === $passwordHash;
         } catch (Exception $e) {
             throw new AuthenticationException(
                 'Failed to authenticate user "%s" against backend "%s". An exception was thrown:',
@@ -236,18 +234,6 @@ class DbUserBackend extends DbRepository implements UserBackendInterface, Inspec
                 $e
             );
         }
-    }
-
-    /**
-     * Extract salt from the given password hash
-     *
-     * @param   string  $hash   The hashed password
-     *
-     * @return  string
-     */
-    protected function getSalt($hash)
-    {
-        return substr($hash, strlen(self::HASH_ALGORITHM), self::SALT_LENGTH);
     }
 
     /**
@@ -285,12 +271,7 @@ class DbUserBackend extends DbRepository implements UserBackendInterface, Inspec
         $insp = new Inspection('Db User Backend');
         $insp->write($this->ds->inspect());
         try {
-            $users = $this->select()->where('is_active', true)->count();
-            if ($users > 0) {
-                $insp->write(sprintf('%s active users', $users));
-            } else {
-                return $insp->error('0 active users', $users);
-            }
+            $insp->write(sprintf('%s active users', $this->select()->where('is_active', true)->count()));
         } catch (Exception $e) {
             $insp->error(sprintf('Query failed: %s', $e->getMessage()));
         }

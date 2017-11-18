@@ -3,6 +3,8 @@
 
 namespace Icinga\Clicommands;
 
+use Icinga\Application\Logger;
+use Icinga\Application\Modules\Manager;
 use Icinga\Cli\Command;
 
 /**
@@ -14,6 +16,9 @@ use Icinga\Cli\Command;
  */
 class ModuleCommand extends Command
 {
+    /**
+     * @var Manager
+     */
     protected $modules;
 
     public function init()
@@ -73,7 +78,9 @@ class ModuleCommand extends Command
                 "%-14s %-9s %-9s %s\n",
                 $module,
                 $mod->getVersion(),
-                ($type === 'enabled' || $this->modules->hasEnabled($module)) ? 'enabled' : 'disabled',
+                ($type === 'enabled' || $this->modules->hasEnabled($module))
+                    ? $this->modules->hasInstalled($module) ? 'enabled' : 'dangling'
+                    : 'disabled',
                 $dir
             );
         }
@@ -109,7 +116,12 @@ class ModuleCommand extends Command
         if (! $module || $this->hasRemainingParams()) {
             return $this->showUsage();
         }
-        $this->modules->disableModule($module);
+
+        if ($this->modules->hasEnabled($module)) {
+            $this->modules->disableModule($module);
+        } else {
+            Logger::info('Module "%s" is already disabled', $module);
+        }
     }
 
     /**

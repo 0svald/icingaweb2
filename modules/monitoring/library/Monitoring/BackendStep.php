@@ -151,6 +151,7 @@ class BackendStep extends Step
             }
 
             $resourceHtml .= ''
+<<<<<<< HEAD
                 . '</tbody>'
                 . '</table>';
         } else { // $this->data['resourceConfig']['type'] === 'livestatus'
@@ -166,6 +167,8 @@ class BackendStep extends Step
                 . '<td><strong>' . t('Socket') . '</strong></td>'
                 . '<td>' . $this->data['resourceConfig']['socket'] . '</td>'
                 . '</tr>'
+=======
+>>>>>>> upstream/master
                 . '</tbody>'
                 . '</table>';
         }

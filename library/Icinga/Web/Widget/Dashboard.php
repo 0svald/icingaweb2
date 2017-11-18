@@ -153,7 +153,6 @@ class Dashboard extends AbstractWidget
                 if ((bool) $part->get('disabled', false) === true) {
                     $panes[$key]->setDisabled();
                 }
-
             } else {
                 list($paneName, $dashletName) = explode('.', $key, 2);
                 $part->pane = $paneName;
@@ -375,7 +374,11 @@ class Dashboard extends AbstractWidget
     {
         $active = null;
 
+<<<<<<< HEAD
         foreach ($this->panes as $key=>$pane) {
+=======
+        foreach ($this->panes as $key => $pane) {
+>>>>>>> upstream/master
             if ($pane->getDisabled() === false) {
                 $active = $key;
                 break;

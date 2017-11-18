@@ -19,18 +19,6 @@ use Icinga\Web\Form\Element\CsrfCounterMeasure;
 /**
  * Base class for forms providing CSRF protection, confirmation logic and auto submission
  *
- * @method $this setDefaults(array $defaults) {
- *     Use `Form::populate()' for setting default values for elements instead because `Form::setDefaults()' does not
- *     create the form via `Form::create()'.
- *
- *     Due to a BC introduced with https://github.com/mhujer/zf1/commit/244e3d3f88a363ee0ca49cf63eee31f925f515cd
- *     we cannot override this function without running into a strict standards violation on Zend version 1.12.7.
- *
- *     @param   array $defaults
- *
- *     @return  $this
- * }
- *
  * @method \Zend_Form_Element[] getElements() {
  *     {@inheritdoc}
  *     @return \Zend_Form_Element[]
@@ -784,7 +772,8 @@ class Form extends Zend_Form
                     $action = $action->without(array_keys($this->getElements()));
                 }
 
-                // TODO(el): Re-evalute this necessity. JavaScript could use the container's URL if there's no action set.
+                // TODO(el): Re-evalute this necessity.
+                // JavaScript could use the container'sURL if there's no action set.
                 // We MUST set an action as JS gets confused otherwise, if
                 // this form is being displayed in an additional column
                 $this->setAction($action);
@@ -805,7 +794,6 @@ class Form extends Zend_Form
      */
     public function createElements(array $formData)
     {
-
     }
 
     /**
@@ -827,7 +815,6 @@ class Form extends Zend_Form
      */
     public function onRequest()
     {
-
     }
 
     /**
@@ -948,7 +935,11 @@ class Form extends Zend_Form
             if ($this->getUseFormAutosubmit()) {
                 $warningId = 'autosubmit_warning_' . $el->getId();
                 $warningText = $this->getView()->escape($this->translate(
+<<<<<<< HEAD
                     'Upon its value changing, this field issues an automatic update of this page.'
+=======
+                    'This page will be automatically updated upon change of the value'
+>>>>>>> upstream/master
                 ));
                 $autosubmitDecorator = $this->_getDecorator('Callback', array(
                     'placement' => 'PREPEND',
@@ -1086,6 +1077,21 @@ class Form extends Zend_Form
     }
 
     /**
+     * {@inheritdoc}
+     *
+     * Creates the form if not created yet.
+     *
+     * @param   array   $values
+     *
+     * @return  $this
+     */
+    public function setDefaults(array $values)
+    {
+        $this->create($values);
+        return parent::setDefaults($values);
+    }
+
+    /**
      * Populate the elements with the given values
      *
      * @param   array   $defaults   The values to populate the elements with
@@ -1107,11 +1113,11 @@ class Form extends Zend_Form
      */
     protected function preserveDefaults(Zend_Form $form, array & $defaults)
     {
-        foreach ($form->getElements() as $name => $_) {
-            if (
-                array_key_exists($name, $defaults)
-                && array_key_exists($name . static::DEFAULT_SUFFIX, $defaults)
-                && $defaults[$name] === $defaults[$name . static::DEFAULT_SUFFIX]
+        foreach ($form->getElements() as $name => $element) {
+            if ((array_key_exists($name, $defaults)
+                    && array_key_exists($name . static::DEFAULT_SUFFIX, $defaults)
+                    && $defaults[$name] === $defaults[$name . static::DEFAULT_SUFFIX])
+                || $element->getAttrib('disabled')
             ) {
                 unset($defaults[$name]);
             }
@@ -1171,9 +1177,7 @@ class Form extends Zend_Form
                         $this->getView()->layout()->redirectUrl = $this->getRedirectUrl()->getAbsoluteUrl();
                     }
                 } elseif ($this->getIsApiTarget()) {
-                    $this->getResponse()->json()->setFailData(
-                        array_merge($this->getMessages(), $this->getErrorMessages())
-                    )->sendResponse();
+                    $this->getResponse()->json()->setFailData($this->getMessages())->sendResponse();
                 }
             } elseif ($this->getValidatePartial()) {
                 // The form can't be processed but we may want to show validation errors though
@@ -1243,8 +1247,7 @@ class Form extends Zend_Form
                     // Ensure that disabled elements are not overwritten
                     // (http://www.zendframework.com/issues/browse/ZF-6909)
                     $formData[$name] = $element->getValue();
-                } elseif (
-                    array_key_exists($name . static::DEFAULT_SUFFIX, $formData)
+                } elseif (array_key_exists($name . static::DEFAULT_SUFFIX, $formData)
                     && $formData[$name] === $formData[$name . static::DEFAULT_SUFFIX]
                 ) {
                     unset($formData[$name]);
@@ -1585,7 +1588,16 @@ class Form extends Zend_Form
      */
     public function error($message, $markAsError = true)
     {
+<<<<<<< HEAD
         $this->addNotification($message, self::NOTIFICATION_ERROR);
+=======
+        if ($this->getIsApiTarget()) {
+            $this->addErrorMessage($message);
+        } else {
+            $this->addNotification($message, self::NOTIFICATION_ERROR);
+        }
+
+>>>>>>> upstream/master
         if ($markAsError) {
             $this->markAsError();
         }
@@ -1603,7 +1615,16 @@ class Form extends Zend_Form
      */
     public function warning($message, $markAsError = true)
     {
+<<<<<<< HEAD
         $this->addNotification($message, self::NOTIFICATION_WARNING);
+=======
+        if ($this->getIsApiTarget()) {
+            $this->addErrorMessage($message);
+        } else {
+            $this->addNotification($message, self::NOTIFICATION_WARNING);
+        }
+
+>>>>>>> upstream/master
         if ($markAsError) {
             $this->markAsError();
         }
@@ -1621,7 +1642,12 @@ class Form extends Zend_Form
      */
     public function info($message, $markAsError = true)
     {
-        $this->addNotification($message, self::NOTIFICATION_INFO);
+        if ($this->getIsApiTarget()) {
+            $this->addErrorMessage($message);
+        } else {
+            $this->addNotification($message, self::NOTIFICATION_INFO);
+        }
+
         if ($markAsError) {
             $this->markAsError();
         }

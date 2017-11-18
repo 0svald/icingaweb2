@@ -1,5 +1,9 @@
 Module: setup
+<<<<<<< HEAD
 Version: 2.4.0
+=======
+Version: 2.4.2
+>>>>>>> upstream/master
 Description: Setup module
  Web based wizard for setting up Icinga Web 2 and its modules.
  This includes the data backends (e.g. relational database, LDAP),

@@ -4,10 +4,18 @@
 namespace Icinga\Module\Monitoring\Command\Transport;
 
 use Icinga\Application\Logger;
+<<<<<<< HEAD
+=======
+use Icinga\Exception\Json\JsonDecodeException;
+>>>>>>> upstream/master
 use Icinga\Module\Monitoring\Command\IcingaApiCommand;
 use Icinga\Module\Monitoring\Command\IcingaCommand;
 use Icinga\Module\Monitoring\Command\Renderer\IcingaApiCommandRenderer;
 use Icinga\Module\Monitoring\Exception\CommandTransportException;
+<<<<<<< HEAD
+=======
+use Icinga\Module\Monitoring\Exception\CurlException;
+>>>>>>> upstream/master
 use Icinga\Module\Monitoring\Web\Rest\RestRequest;
 
 /**
@@ -193,12 +201,30 @@ class ApiCommandTransport implements CommandTransportInterface
             $this->getHost(),
             $this->getPort()
         );
+<<<<<<< HEAD
         $response = RestRequest::post($this->getUriFor($command->getEndpoint()))
             ->authenticateWith($this->getUsername(), $this->getPassword())
             ->sendJson()
             ->noStrictSsl()
             ->setPayload($command->getData())
             ->send();
+=======
+
+        try {
+            $response = RestRequest::post($this->getUriFor($command->getEndpoint()))
+                ->authenticateWith($this->getUsername(), $this->getPassword())
+                ->sendJson()
+                ->noStrictSsl()
+                ->setPayload($command->getData())
+                ->send();
+        } catch (JsonDecodeException $e) {
+            throw new CommandTransportException(
+                'Got invalid JSON response from the Icinga 2 API: %s',
+                $e->getMessage()
+            );
+        }
+
+>>>>>>> upstream/master
         if (isset($response['error'])) {
             throw new CommandTransportException(
                 'Can\'t send external Icinga command: %u %s',
@@ -207,7 +233,13 @@ class ApiCommandTransport implements CommandTransportInterface
             );
         }
         $result = array_pop($response['results']);
+<<<<<<< HEAD
         if ($result['code'] < 200 || $result['code'] >= 300) {
+=======
+        if (! empty($result)
+            && ($result['code'] < 200 || $result['code'] >= 300)
+        ) {
+>>>>>>> upstream/master
             throw new CommandTransportException(
                 'Can\'t send external Icinga command: %u %s',
                 $result['code'],
@@ -231,4 +263,41 @@ class ApiCommandTransport implements CommandTransportInterface
     {
         $this->sendCommand($this->renderer->render($command));
     }
+<<<<<<< HEAD
+=======
+
+    /**
+     * Try to connect to the API
+     *
+     * @throws  CommandTransportException   In case of failure
+     */
+    public function probe()
+    {
+        $request = RestRequest::get($this->getUriFor(null))
+            ->authenticateWith($this->getUsername(), $this->getPassword())
+            ->noStrictSsl();
+
+        try {
+            $response = $request->send();
+        } catch (CurlException $e) {
+            throw new CommandTransportException(
+                'Couldn\'t connect to the Icinga 2 API: %s',
+                $e->getMessage()
+            );
+        } catch (JsonDecodeException $e) {
+            throw new CommandTransportException(
+                'Got invalid JSON response from the Icinga 2 API: %s',
+                $e->getMessage()
+            );
+        }
+
+        if (isset($response['error'])) {
+            throw new CommandTransportException(
+                'Can\'t connect to the Icinga 2 API: %u %s',
+                $response['error'],
+                $response['status']
+            );
+        }
+    }
+>>>>>>> upstream/master
 }

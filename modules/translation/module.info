@@ -1,5 +1,9 @@
 Module: translation
+<<<<<<< HEAD
 Version: 2.4.0
+=======
+Version: 2.4.2
+>>>>>>> upstream/master
 Description: Translation module
  This module allows developers and translators to translate Icinga Web 2 and
  its modules for multiple languages. You do not need this module to run an

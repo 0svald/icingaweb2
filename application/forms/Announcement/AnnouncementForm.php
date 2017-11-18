@@ -3,6 +3,10 @@
 
 namespace Icinga\Forms\Announcement;
 
+<<<<<<< HEAD
+=======
+use DateTime;
+>>>>>>> upstream/master
 use Icinga\Authentication\Auth;
 use Icinga\Data\Filter\Filter;
 use Icinga\Forms\RepositoryForm;
@@ -21,43 +25,72 @@ class AnnouncementForm extends RepositoryForm
             'text',
             'author',
             array(
+<<<<<<< HEAD
                 'required'  => true,
                 'value'     => Auth::getInstance()->getUser()->getUsername(),
                 'disabled'  => true
+=======
+                'disabled'  => true,
+                'required'  => true,
+                'value'     => Auth::getInstance()->getUser()->getUsername()
+>>>>>>> upstream/master
             )
         );
         $this->addElement(
             'textarea',
             'message',
             array(
+<<<<<<< HEAD
                 'required'      => true,
                 'label'         => $this->translate('Message'),
                 'description'   => $this->translate('The message to display to users')
+=======
+                'description'   => $this->translate('The message to display to users'),
+                'label'         => $this->translate('Message'),
+                'required'      => true
+>>>>>>> upstream/master
             )
         );
         $this->addElement(
             'dateTimePicker',
             'start',
             array(
+<<<<<<< HEAD
                 'required'      => true,
                 'label'         => $this->translate('Start'),
                 'description'   => $this->translate('The time to display the announcement from')
+=======
+                'description'   => $this->translate('The time to display the announcement from'),
+                'label'         => $this->translate('Start'),
+                'placeholder'   => new DateTime('tomorrow'),
+                'required'      => true
+>>>>>>> upstream/master
             )
         );
         $this->addElement(
             'dateTimePicker',
             'end',
             array(
+<<<<<<< HEAD
                 'required'      => true,
                 'label'         => $this->translate('End'),
                 'description'   => $this->translate('The time to display the announcement until')
+=======
+                'description'   => $this->translate('The time to display the announcement until'),
+                'label'         => $this->translate('End'),
+                'placeholder'   => new DateTime('tomorrow +1day'),
+                'required'      => true
+>>>>>>> upstream/master
             )
         );
 
         $this->setTitle($this->translate('Create a new announcement'));
         $this->setSubmitLabel($this->translate('Create'));
     }
+<<<<<<< HEAD
 
+=======
+>>>>>>> upstream/master
     /**
      * {@inheritDoc}
      */

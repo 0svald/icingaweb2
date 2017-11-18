@@ -221,9 +221,9 @@ class DbTool
      */
     public function connect($dbname = null)
     {
-        $this->_pdoConnect($dbname);
+        $this->pdoConnect($dbname);
         if ($dbname !== null) {
-            $this->_zendConnect($dbname);
+            $this->zendConnect($dbname);
             $this->dbFromConfig = $dbname === $this->config['dbname'];
         }
     }
@@ -247,7 +247,7 @@ class DbTool
      *
      * @throws  ConfigurationError  In case the resource type is not a supported PDO driver name
      */
-    protected function _zendConnect($dbname)
+    private function zendConnect($dbname)
     {
         if ($this->zendConn !== null) {
             return;
@@ -299,7 +299,7 @@ class DbTool
      *
      * @param   string  $dbname     The name of the database to connect with
      */
-    protected function _pdoConnect($dbname)
+    private function pdoConnect($dbname)
     {
         if ($this->pdoConn !== null) {
             return;
@@ -310,8 +310,12 @@ class DbTool
             PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
         );
 
+<<<<<<< HEAD
         if (
             $this->config['db'] === 'mysql'
+=======
+        if ($this->config['db'] === 'mysql'
+>>>>>>> upstream/master
             && isset($this->config['use_ssl'])
             && $this->config['use_ssl']
         ) {
@@ -379,7 +383,12 @@ class DbTool
         } catch (PDOException $e) {
             if ($this->config['db'] === 'mysql') {
                 $code = $e->getCode();
-                if ($code !== 1040 && $code !== 1045) {
+                /*
+                 * 1040 .. Too many connections
+                 * 1045 .. Access denied for user '%s'@'%s' (using password: %s)
+                 * 1698 .. Access denied for user '%s'@'%s'
+                 */
+                if ($code !== 1040 && $code !== 1045 && $code !== 1698) {
                     throw $e;
                 }
             } elseif ($this->config['db'] === 'pgsql') {

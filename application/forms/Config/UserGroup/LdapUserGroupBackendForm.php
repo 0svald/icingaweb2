@@ -294,6 +294,30 @@ class LdapUserGroupBackendForm extends Form
                 'value'             => $defaults->user_base_dn
             )
         );
+        $this->addElement(
+            'text',
+            'domain',
+            array(
+                'label'         => $this->translate('Domain'),
+                'description'   => $this->translate(
+                    'The domain the LDAP server is responsible for.'
+                )
+            )
+        );
+    }
+
+    /**
+     * Create and add all elements for the user configuration as hidden inputs
+     *
+     * This is required to purge already present options when unlinking a group backend with a user backend.
+     */
+    protected function createHiddenUserConfigElements()
+    {
+        $this->addElement('hidden', 'user_class', array('disabled' => true));
+        $this->addElement('hidden', 'user_filter', array('disabled' => true));
+        $this->addElement('hidden', 'user_name_attribute', array('disabled' => true));
+        $this->addElement('hidden', 'user_base_dn', array('disabled' => true));
+        $this->addElement('hidden', 'domain', array('disabled' => true));
     }
 
     /**
@@ -346,8 +370,7 @@ class LdapUserGroupBackendForm extends Form
         foreach (UserBackend::getBackendConfigs() as $name => $config) {
             if (in_array(strtolower($config->backend), array('ldap', 'msldap'))) {
                 $backendResource = ResourceFactory::create($config->resource);
-                if (
-                    $backendResource->getHostname() === $resource->getHostname()
+                if ($backendResource->getHostname() === $resource->getHostname()
                     && $backendResource->getPort() === $resource->getPort()
                 ) {
                     $names[] = $name;

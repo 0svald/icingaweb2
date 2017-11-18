@@ -16,6 +16,7 @@ use Icinga\Web\Announcement;
  */
 class AnnouncementIniRepository extends IniRepository
 {
+<<<<<<< HEAD
     /**
      * {@inheritdoc}
      */
@@ -29,14 +30,23 @@ class AnnouncementIniRepository extends IniRepository
     /**
      * {@inheritDoc}
      */
+=======
+    protected $queryColumns = array('announcement' => array('id', 'author', 'message', 'hash', 'start', 'end'));
+
+    protected $triggers = array('announcement');
+
+>>>>>>> upstream/master
     protected $configs = array('announcement' => array(
         'name'      => 'announcements',
         'keyColumn' => 'id'
     ));
 
+<<<<<<< HEAD
     /**
      * {@inheritDoc}
      */
+=======
+>>>>>>> upstream/master
     protected $conversionRules = array('announcement' => array(
         'start' => 'timestamp',
         'end'   => 'timestamp'
@@ -54,8 +64,15 @@ class AnnouncementIniRepository extends IniRepository
         if ($timestamp !== null) {
             $dateTime = new DateTime();
             $dateTime->setTimestamp($timestamp);
+<<<<<<< HEAD
             return $dateTime;
         }
+=======
+
+            return $dateTime;
+        }
+
+>>>>>>> upstream/master
         return null;
     }
 
@@ -83,6 +100,10 @@ class AnnouncementIniRepository extends IniRepository
         if (! isset($new->id)) {
             $new->id = uniqid();
         }
+<<<<<<< HEAD
+=======
+
+>>>>>>> upstream/master
         if (! isset($new->hash)) {
             $announcement = new Announcement($new->toArray());
             $new->hash = $announcement->getHash();
@@ -117,11 +138,22 @@ class AnnouncementIniRepository extends IniRepository
     public function getEtag()
     {
         $file = $this->getDataSource('announcement')->getConfigFile();
+<<<<<<< HEAD
         if (@is_readable($file)) {
             $mtime = filemtime($file);
             $size = filesize($file);
             return hash('crc32', $mtime . $size);
         }
+=======
+
+        if (@is_readable($file)) {
+            $mtime = filemtime($file);
+            $size = filesize($file);
+
+            return hash('crc32', $mtime . $size);
+        }
+
+>>>>>>> upstream/master
         return null;
     }
 
@@ -133,6 +165,10 @@ class AnnouncementIniRepository extends IniRepository
     public function findActive()
     {
         $now = new DateTime();
+<<<<<<< HEAD
+=======
+
+>>>>>>> upstream/master
         $query = $this
             ->select(array('hash', 'message'))
             ->setFilter(new FilterAnd(array(
@@ -140,6 +176,10 @@ class AnnouncementIniRepository extends IniRepository
                 Filter::expression('end', '>=', $now)
             )))
             ->order('start');
+<<<<<<< HEAD
+=======
+
+>>>>>>> upstream/master
         return $query;
     }
 
@@ -151,20 +191,37 @@ class AnnouncementIniRepository extends IniRepository
     public function findNextActive()
     {
         $now = new DateTime();
+<<<<<<< HEAD
+=======
+
+>>>>>>> upstream/master
         $query = $this
             ->select(array('start', 'end'))
             ->setFilter(Filter::matchAny(array(
                 Filter::expression('start', '>', $now), Filter::expression('end', '>', $now)
             )));
+<<<<<<< HEAD
         $refresh = null;
         foreach ($query as $row) {
             $min = min($row->start->getTimestamp(), $row->end->getTimestamp());
+=======
+
+        $refresh = null;
+
+        foreach ($query as $row) {
+            $min = min($row->start->getTimestamp(), $row->end->getTimestamp());
+
+>>>>>>> upstream/master
             if ($refresh === null) {
                 $refresh = $min;
             } else {
                 $refresh = min($refresh, $min);
             }
         }
+<<<<<<< HEAD
+=======
+
+>>>>>>> upstream/master
         return $refresh;
     }
 }

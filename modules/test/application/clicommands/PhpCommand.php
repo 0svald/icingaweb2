@@ -3,6 +3,7 @@
 
 namespace Icinga\Module\Test\Clicommands;
 
+use Icinga\Application\Icinga;
 use Icinga\Cli\Command;
 
 /**
@@ -10,18 +11,6 @@ use Icinga\Cli\Command;
  */
 class PhpCommand extends Command
 {
-    /**
-     * Default arguments and options for PHP_CodeSniffer
-     *
-     * @var array
-     */
-    protected $phpcsDefaultParams = array(
-        '-p',
-        '--standard=PSR2',
-        '--extensions=php',
-        '--encoding=utf-8'
-    );
-
     /**
      * Run all unit-test suites
      *
@@ -42,6 +31,11 @@ class PhpCommand extends Command
      *   icingacli test php unit --verbose
      *   icingacli test php unit --build
      *   icingacli test php unit --include=*SpecialTest
+     *
+     * NOTES
+     *
+     *   Default settings are defined via `modules/test/phpunit.xml` under icingaweb'
+     *   installation directory.
      */
     public function unitAction()
     {
@@ -69,8 +63,12 @@ class PhpCommand extends Command
             $options[] = $include;
         }
 
-        chdir(realpath(__DIR__ . '/../..'));
-        $command = $phpUnit . ' ' . join(' ', array_merge($options, $this->params->getAllStandalone()));
+        chdir(Icinga::app()->getBaseDir());
+        $command = $this->getEnvironmentVariables()
+            . $phpUnit
+            . ' -c modules/test/phpunit.xml'
+            . ' ' . join(' ', array_merge($options, $this->params->getAllStandalone()));
+        
         if ($this->isVerbose) {
             $res = `$command`;
             foreach (preg_split('/\n/', $res) as $line) {
@@ -111,6 +109,11 @@ class PhpCommand extends Command
      *   icingacli test php style --build
      *   icingacli test php style --include=path/to/your/file
      *   icingacli test php style --exclude=*someFile* --exclude=someOtherFile*
+     *
+     * NOTES
+     *
+     *   Default rules are defined via `phpcs.xml` and `icingaweb2.ruleset.xml` in icingaweb'
+     *   installation directory.
      */
     public function styleAction()
     {
@@ -135,21 +138,16 @@ class PhpCommand extends Command
         if (!empty($exclude)) {
             $options[] = '--ignore=' . join(',', $exclude);
         }
-        $arguments = array_filter(array_map(function ($p) { return realpath($p); }, $include));
-        if (empty($arguments)) {
-            $arguments = array(
-                realpath(__DIR__ . '/../../../../application'),
-                realpath(__DIR__ . '/../../../../library/Icinga')
-            );
-        }
+        $arguments = array_filter(array_map(function ($p) {
+            return realpath($p);
+        }, $include));
 
-        chdir(realpath(__DIR__ . '/../..'));
+        chdir(Icinga::app()->getBaseDir());
         passthru(
             $phpcs . ' ' . join(
                 ' ',
                 array_merge(
                     $options,
-                    $this->phpcsDefaultParams,
                     $arguments,
                     $this->params->getAllStandalone()
                 )
@@ -170,5 +168,23 @@ class PhpCommand extends Command
         }
 
         return $path;
+    }
+
+    /**
+     * Setup some required environment variables
+     */
+    protected function getEnvironmentVariables()
+    {
+        $vars = array();
+        $vars[] = sprintf('ICINGAWEB_BASEDIR=%s', $this->app->getBaseDir());
+        $vars[] = sprintf('ICINGAWEB_ICINGA_LIB=%s', $this->app->getLibraryDir('Icinga'));
+
+        // Disabled as the bootstrap.php for PHPUnit and class BaseTestCase can't handle multiple paths yet
+        /*$vars[] = sprintf(
+            'ICINGAWEB_MODULES_DIR=%s',
+            implode(PATH_SEPARATOR, $this->app->getModuleManager()->getModuleDirs())
+        );*/
+
+        return join(' ', $vars) . ' ';
     }
 }

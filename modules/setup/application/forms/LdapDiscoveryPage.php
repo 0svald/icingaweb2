@@ -31,7 +31,7 @@ class LdapDiscoveryPage extends Form
         $this->setTitle($this->translate('LDAP Discovery', 'setup.page.title'));
         $this->addDescription($this->translate(
             'You can use this page to discover LDAP or ActiveDirectory servers ' .
-            ' for authentication. If you don\' want to execute a discovery, just skip this step.'
+            ' for authentication. If you don\'t want to execute a discovery, just skip this step.'
         ));
     }
 
@@ -74,6 +74,8 @@ class LdapDiscoveryPage extends Form
                 $this->discovery = Discovery::discoverDomain($data['domain']);
                 if ($this->discovery->isSuccess()) {
                     return true;
+                } else {
+                    $this->error($this->discovery->getError()->getMessage());
                 }
             } catch (Exception $e) {
                 $this->error(sprintf(

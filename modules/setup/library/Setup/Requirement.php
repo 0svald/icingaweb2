@@ -279,7 +279,12 @@ abstract class Requirement
      *
      * @return  Requirement
      */
+<<<<<<< HEAD
     public function setTextAvailable($textAvailable) {
+=======
+    public function setTextAvailable($textAvailable)
+    {
+>>>>>>> upstream/master
         $this->textAvailable = $textAvailable;
         return $this;
     }
@@ -289,7 +294,12 @@ abstract class Requirement
      *
      * @return  string
      */
+<<<<<<< HEAD
     public function getTextAvailable() {
+=======
+    public function getTextAvailable()
+    {
+>>>>>>> upstream/master
         return $this->textAvailable;
     }
 
@@ -300,7 +310,12 @@ abstract class Requirement
      *
      * @return  Requirement
      */
+<<<<<<< HEAD
     public function setTextMissing($textMissing) {
+=======
+    public function setTextMissing($textMissing)
+    {
+>>>>>>> upstream/master
         $this->textMissing = $textMissing;
         return $this;
     }
@@ -310,7 +325,12 @@ abstract class Requirement
      *
      * @return  string
      */
+<<<<<<< HEAD
     public function getTextMissing() {
+=======
+    public function getTextMissing()
+    {
+>>>>>>> upstream/master
         return $this->textMissing;
     }
 

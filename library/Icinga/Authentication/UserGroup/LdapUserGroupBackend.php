@@ -10,6 +10,7 @@ use Icinga\Data\ConfigObject;
 use Icinga\Exception\ConfigurationError;
 use Icinga\Exception\ProgrammingError;
 use Icinga\Protocol\Ldap\LdapException;
+use Icinga\Protocol\Ldap\LdapUtils;
 use Icinga\Repository\LdapRepository;
 use Icinga\Repository\RepositoryQuery;
 use Icinga\User;
@@ -101,6 +102,16 @@ class LdapUserGroupBackend extends LdapRepository implements UserGroupBackendInt
     protected $nestedGroupSearch;
 
     /**
+<<<<<<< HEAD
+=======
+     * The domain the backend is responsible for
+     *
+     * @var string
+     */
+    protected $domain;
+
+    /**
+>>>>>>> upstream/master
      * The columns which are not permitted to be queried
      *
      * @var array
@@ -395,7 +406,49 @@ class LdapUserGroupBackend extends LdapRepository implements UserGroupBackendInt
     }
 
     /**
+<<<<<<< HEAD
+=======
+     * Get the domain the backend is responsible for
+     *
+     * If the LDAP group backend is linked with a LDAP user backend,
+     * the domain of the user backend will be returned.
+     *
+     * @return string
+     */
+    public function getDomain()
+    {
+        return $this->userBackend !== null ? $this->userBackend->getDomain() : $this->domain;
+    }
+
+    /**
+     * Set the domain the backend is responsible for
+     *
+     * If the LDAP group backend is linked with a LDAP user backend,
+     * the domain of the user backend will be used nonetheless.
+     *
+     * @param   string  $domain
+     *
+     * @return  $this
+     */
+    public function setDomain($domain)
+    {
+        $domain = trim($domain);
+
+        if (strlen($domain)) {
+            $this->domain = $domain;
+        }
+
+        return $this;
+    }
+
+    /**
+>>>>>>> upstream/master
      * Return whether the attribute name where to find a group's member holds ambiguous values
+     *
+     * This tries to detect if the member attribute of groups contain:
+     *
+     *  full DN -> distinguished name of another object
+     *  other   -> ambiguous field referencing the member by userNameAttribute
      *
      * @return  bool
      *
@@ -422,7 +475,8 @@ class LdapUserGroupBackend extends LdapRepository implements UserGroupBackendInt
                 ->setUnfoldAttribute($this->groupMemberAttribute)
                 ->setBase($this->groupBaseDn)
                 ->fetchOne();
-            $this->ambiguousMemberAttribute = !$this->isRelatedDn($sampleValue);
+
+            $this->ambiguousMemberAttribute = ! LdapUtils::isDn($sampleValue);
         }
 
         return $this->ambiguousMemberAttribute;
@@ -632,13 +686,25 @@ class LdapUserGroupBackend extends LdapRepository implements UserGroupBackendInt
      */
     public function getMemberships(User $user)
     {
+        $domain = $this->getDomain();
+
+        if ($domain !== null) {
+            if (! $user->hasDomain() || strtolower($user->getDomain()) !== $domain) {
+                return array();
+            }
+
+            $username = $user->getLocalUsername();
+        } else {
+            $username = $user->getUsername();
+        }
+
         if ($this->isMemberAttributeAmbiguous()) {
-            $queryValue = $user->getUsername();
+            $queryValue = $username;
         } elseif (($queryValue = $user->getAdditional('ldap_dn')) === null) {
             $userQuery = $this->ds
                 ->select()
                 ->from($this->userClass)
-                ->where($this->userNameAttribute, $user->getUsername())
+                ->where($this->userNameAttribute, $username)
                 ->setBase($this->userBaseDn)
                 ->setUsePagedResults(false);
             if ($this->userFilter) {
@@ -668,6 +734,9 @@ class LdapUserGroupBackend extends LdapRepository implements UserGroupBackendInt
         $groups = array();
         foreach ($groupQuery as $row) {
             $groups[] = $row->{$this->groupNameAttribute};
+            if ($domain !== null) {
+                $groups[] = $row->{$this->groupNameAttribute} . "@$domain";
+            }
         }
 
         return $groups;
@@ -713,8 +782,7 @@ class LdapUserGroupBackend extends LdapRepository implements UserGroupBackendInt
                 throw new ConfigurationError('User backend "%s" is not of type LDAP', $config->user_backend);
             }
 
-            if (
-                $this->ds->getHostname() !== $userBackend->getDataSource()->getHostname()
+            if ($this->ds->getHostname() !== $userBackend->getDataSource()->getHostname()
                 || $this->ds->getPort() !== $userBackend->getDataSource()->getPort()
             ) {
                 // TODO(jom): Elaborate whether it makes sense to link directories on different hosts
@@ -729,7 +797,8 @@ class LdapUserGroupBackend extends LdapRepository implements UserGroupBackendInt
                 'user_base_dn'          => $userBackend->getBaseDn(),
                 'user_class'            => $userBackend->getUserClass(),
                 'user_name_attribute'   => $userBackend->getUserNameAttribute(),
-                'user_filter'           => $userBackend->getFilter()
+                'user_filter'           => $userBackend->getFilter(),
+                'domain'                => $userBackend->getDomain()
             ));
         }
 
@@ -743,7 +812,12 @@ class LdapUserGroupBackend extends LdapRepository implements UserGroupBackendInt
             ->setGroupMemberAttribute($config->get('group_member_attribute', $defaults->group_member_attribute))
             ->setGroupFilter($config->group_filter)
             ->setUserFilter($config->user_filter)
+<<<<<<< HEAD
             ->setNestedGroupSearch((bool) $config->get('nested_group_search', $defaults->nested_group_search));
+=======
+            ->setNestedGroupSearch((bool) $config->get('nested_group_search', $defaults->nested_group_search))
+            ->setDomain($defaults->get('domain', $config->domain));
+>>>>>>> upstream/master
     }
 
     /**

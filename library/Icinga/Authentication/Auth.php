@@ -259,6 +259,9 @@ class Auth
         foreach ($this->getAuthChain() as $userBackend) {
             if ($userBackend instanceof ExternalBackend) {
                 if ($userBackend->authenticate($user)) {
+                    if (! $user->hasDomain()) {
+                        $user->setDomain(Config::app()->get('authentication', 'default_domain'));
+                    }
                     $this->setAuthenticated($user);
                     return true;
                 }
@@ -293,6 +296,9 @@ class Auth
             return false;
         }
         $user = new User($credentials[0]);
+        if (! $user->hasDomain()) {
+            $user->setDomain(Config::app()->get('authentication', 'default_domain'));
+        }
         $password = $credentials[1];
         if ($this->getAuthChain()->setSkipExternalBackends(true)->authenticate($user, $password)) {
             $this->setAuthenticated($user, false);
@@ -337,7 +343,7 @@ class Auth
      */
     public function persistCurrentUser()
     {
-        // @TODO(el): https://dev.icinga.org/issues/10646
+        // @TODO(el): https://dev.icinga.com/issues/10646
         $params = session_get_cookie_params();
         setcookie(
             'icingaweb2-session',

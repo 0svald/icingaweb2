@@ -656,7 +656,11 @@ abstract class IdoQuery extends DbQuery
                     $column
                 );
                 if (version_compare($this->getIdoVersion(), '1.14.2', '>=')) {
+<<<<<<< HEAD
                     $column = str_replace('NOW()', 'localtimestamp', $column);
+=======
+                    $column = str_replace('NOW()', 'NOW() AT TIME ZONE \'UTC\'', $column);
+>>>>>>> upstream/master
                 } else {
                     $column = preg_replace(
                         '/UNIX_TIMESTAMP(\((?>[^()]|(?-1))*\))/i',
@@ -680,7 +684,9 @@ abstract class IdoQuery extends DbQuery
 
         foreach (Hook::all('monitoring/idoQueryExtension') as $hook) {
             $extensions = $hook->extendColumnMap($this);
-            if (! is_array($extensions)) continue;
+            if (! is_array($extensions)) {
+                continue;
+            }
 
             foreach ($extensions as $vTable => $cols) {
                 if (! array_key_exists($vTable, $this->columnMap)) {
@@ -1150,6 +1156,9 @@ abstract class IdoQuery extends DbQuery
 
         $groupedTables = array();
         foreach ($this->groupBase as $baseTable => $aliasedPks) {
+            if (! $this->hasJoinedVirtualTable($baseTable)) {
+                continue;
+            }
             $groupedTables[$baseTable] = true;
             foreach ($aliasedPks as $aliasedPk) {
                 $group[] = $aliasedPk;
@@ -1158,6 +1167,14 @@ abstract class IdoQuery extends DbQuery
 
         foreach (new ColumnFilterIterator($this->columns) as $desiredAlias => $desiredColumn) {
             $alias = is_string($desiredAlias) ? $this->customAliasToAlias($desiredAlias) : $desiredColumn;
+            if ($this->isCustomVar($alias) && $this->getDatasource()->getDbType() === 'pgsql') {
+                $table = $this->customVars[$alias];
+                if (! isset($groupedTables[$table])) {
+                    $group[] = $this->getCustomvarColumnName($alias);
+                    $groupedTables[$table] = true;
+                }
+                continue;
+            }
             $table = $this->aliasToTableName($alias);
             if ($table && !isset($groupedTables[$table]) && (
                 in_array($table, $joinedOrigins, true) || $this->getDatasource()->getDbType() === 'pgsql')
@@ -1168,6 +1185,14 @@ abstract class IdoQuery extends DbQuery
 
         if (! empty($group) && $this->getDatasource()->getDbType() === 'pgsql') {
             foreach (new ColumnFilterIterator($this->orderColumns) as $alias) {
+                if ($this->isCustomVar($alias)) {
+                    $table = $this->customVars[$alias];
+                    if (! isset($groupedTables[$table])) {
+                        $group[] = $this->getCustomvarColumnName($alias);
+                        $groupedTables[$table] = true;
+                    }
+                    continue;
+                }
                 $table = $this->aliasToTableName($alias);
                 if ($table && !isset($groupedTables[$table])
                     && !in_array($this->getMappedField($alias), $this->columns, true)
@@ -1219,8 +1244,7 @@ abstract class IdoQuery extends DbQuery
     {
         // TODO: For god's sake, make this being a mapping
         //       (instead of matching a ton of properties using a ridiculous long switch case)
-        switch ($table)
-        {
+        switch ($table) {
             case 'instances':
                 return $this->instance_id;
             case 'objects':

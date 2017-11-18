@@ -30,7 +30,11 @@ class AnnouncementsController extends Controller
         $repo = new AnnouncementIniRepository();
         $this->view->announcements = $repo
             ->select(array('id', 'author', 'message', 'start', 'end'))
+<<<<<<< HEAD
             ->order('start');
+=======
+            ->order('start', 'DESC');
+>>>>>>> upstream/master
     }
 
     /**

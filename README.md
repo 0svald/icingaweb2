@@ -1,7 +1,15 @@
 # Icinga Web 2
 
+<<<<<<< HEAD
 ![Icinga Logo](https://www.icinga.org/wp-content/uploads/2014/06/icinga_logo.png)
 
+=======
+[![Build Status](https://travis-ci.org/Icinga/icingaweb2.png?branch=master)](https://travis-ci.org/Icinga/icingaweb2)
+[![Github Tag](https://img.shields.io/github/tag/Icinga/icingaweb2.svg)](https://github.com/Icinga/icingaweb2)
+
+![Icinga Logo](https://www.icinga.com/wp-content/uploads/2014/06/icinga_logo.png)
+
+>>>>>>> upstream/master
 1. [About](#about)
 2. [License](#license)
 3. [Installation](#installation)
@@ -12,7 +20,7 @@
 ## About
 
 **Icinga Web 2** is the next generation open source monitoring web interface, framework
-and command-line interface developed by the [Icinga Project](https://www.icinga.org/), supporting Icinga 2,
+and command-line interface developed by the [Icinga Project](https://www.icinga.com/), supporting Icinga 2,
 Icinga Core and any other monitoring backend compatible with the IDO database.
 
 ![Icinga Web 2](https://www.icinga.com/wp-content/uploads/2016/12/Icinga-Web-2-v2.4.0.png "Icinga Web 2")
@@ -38,7 +46,16 @@ Check the project website at https://www.icinga.com for status updates. Join the
 or ask an Icinga partner for [professional support](https://www.icinga.com/services/support/).
 
 ## Contributing
+<<<<<<< HEAD
 
 There are many ways to contribute to Icinga -- whether it be creating pull requests on
 [GitHub](https://github.com/Icinga/icingaweb2), sending patches, testing, reporting bugs,
 or reviewing and updating the documentation. Every contribution is appreciated.
+=======
+
+There are many ways to contribute to Icinga -- whether it be sending patches,
+testing, reporting bugs, or reviewing and updating the documentation. Every
+contribution is appreciated!
+
+Please continue reading in the [contributing chapter](CONTRIBUTING.md).
+>>>>>>> upstream/master

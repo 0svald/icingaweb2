@@ -184,6 +184,13 @@ class Hook
      */
     protected static function hasPermission($class)
     {
+<<<<<<< HEAD
+=======
+        if (Icinga::app()->isCli()) {
+            return true;
+        }
+
+>>>>>>> upstream/master
         return Auth::getInstance()->hasPermission(
             Manager::MODULE_PERMISSION_NS . self::extractModuleName($class)
         );
@@ -222,7 +229,6 @@ class Hook
         }
 
         if (!$instance instanceof $base_class) {
-
             // This is a compatibility check. Should be removed one far day:
             if ($module !== null) {
                 $compat_class = 'Icinga\\Module\\'
@@ -259,7 +265,11 @@ class Hook
         }
 
         foreach (self::$hooks[$name] as $key => $hook) {
+<<<<<<< HEAD
             if (self::hasPermission($key)) {
+=======
+            if (self::hasPermission($hook)) {
+>>>>>>> upstream/master
                 if (self::createInstance($name, $key) === null) {
                     return array();
                 }
@@ -282,7 +292,11 @@ class Hook
 
         if (self::has($name)) {
             foreach (self::$hooks[$name] as $key => $hook) {
+<<<<<<< HEAD
                 if (self::hasPermission($key)) {
+=======
+                if (self::hasPermission($hook)) {
+>>>>>>> upstream/master
                     return self::createInstance($name, $key);
                 }
             }
@@ -304,6 +318,8 @@ class Hook
         if (!isset(self::$hooks[$name])) {
             self::$hooks[$name] = array();
         }
+
+        $class = ltrim($class, ClassLoader::NAMESPACE_SEPARATOR);
 
         self::$hooks[$name][$key] = $class;
     }

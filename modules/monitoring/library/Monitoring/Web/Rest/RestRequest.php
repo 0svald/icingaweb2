@@ -5,6 +5,11 @@ namespace Icinga\Module\Monitoring\Web\Rest;
 
 use Exception;
 use Icinga\Application\Logger;
+<<<<<<< HEAD
+=======
+use Icinga\Util\Json;
+use Icinga\Module\Monitoring\Exception\CurlException;
+>>>>>>> upstream/master
 
 /**
  * REST Request
@@ -75,6 +80,24 @@ class RestRequest
     protected $timeout = 30;
 
     /**
+<<<<<<< HEAD
+=======
+     * Create a GET REST request
+     *
+     * @param   string  $uri
+     *
+     * @return  static
+     */
+    public static function get($uri)
+    {
+        $request = new static;
+        $request->uri = $uri;
+        $request->method = 'GET';
+        return $request;
+    }
+
+    /**
+>>>>>>> upstream/master
      * Create a POST REST request
      *
      * @param   string  $uri
@@ -196,15 +219,22 @@ class RestRequest
             'Expect:'
         );
 
+<<<<<<< HEAD
         $ch = curl_init();
 
+=======
+>>>>>>> upstream/master
         $options = array(
             CURLOPT_URL     => $this->uri,
             CURLOPT_TIMEOUT => $this->timeout,
             // Ignore proxy settings
             CURLOPT_PROXY           => '',
+<<<<<<< HEAD
             CURLOPT_CUSTOMREQUEST   => $this->method,
             CURLOPT_RETURNTRANSFER  => true
+=======
+            CURLOPT_CUSTOMREQUEST   => $this->method
+>>>>>>> upstream/master
         );
 
         // Record cURL command line for debugging
@@ -233,20 +263,29 @@ class RestRequest
         $options[CURLOPT_HTTPHEADER] = $headers;
 
         $stream = null;
+<<<<<<< HEAD
         if (Logger::getInstance()->getLevel() === Logger::DEBUG) {
+=======
+        $logger = Logger::getInstance();
+        if ($logger !== null && $logger->getLevel() === Logger::DEBUG) {
+>>>>>>> upstream/master
             $stream = fopen('php://temp', 'w');
             $options[CURLOPT_VERBOSE] = true;
             $options[CURLOPT_STDERR] = $stream;
         }
 
+<<<<<<< HEAD
         curl_setopt_array($ch, $options);
 
+=======
+>>>>>>> upstream/master
         Logger::debug(
             'Executing %s %s',
             implode(' ', $curlCmd),
             escapeshellarg($this->uri)
         );
 
+<<<<<<< HEAD
         $result = curl_exec($ch);
 
         if ($result === false) {
@@ -254,6 +293,9 @@ class RestRequest
         }
 
         curl_close($ch);
+=======
+        $result = $this->curlExec($options);
+>>>>>>> upstream/master
 
         if (is_resource($stream)) {
             rewind($stream);
@@ -261,6 +303,7 @@ class RestRequest
             fclose($stream);
         }
 
+<<<<<<< HEAD
         $response = @json_decode($result, true);
 
         if ($response === null) {
@@ -291,5 +334,32 @@ class RestRequest
         }
 
         return $response;
+=======
+        return Json::decode($result, true);
+    }
+
+    /**
+     * Set up a new cURL handle with the given options and call {@link curl_exec()}
+     *
+     * @param   array   $options
+     *
+     * @return  string  The response
+     *
+     * @throws  CurlException
+     */
+    protected function curlExec(array $options)
+    {
+        $ch = curl_init();
+        $options[CURLOPT_RETURNTRANSFER] = true;
+        curl_setopt_array($ch, $options);
+        $result = curl_exec($ch);
+
+        if ($result === false) {
+            throw new CurlException('%s', curl_error($ch));
+        }
+
+        curl_close($ch);
+        return $result;
+>>>>>>> upstream/master
     }
 }

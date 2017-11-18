@@ -76,7 +76,7 @@ class ListCommand extends Command
     protected function showFormatted($query, $format, $columns)
     {
         $query = $query->getQuery();
-        switch($format) {
+        switch ($format) {
             case 'json':
                 echo json_encode($query->fetchAll());
                 break;
@@ -129,17 +129,27 @@ class ListCommand extends Command
      *
      *   --format=<csv|json|<custom>>
      *     Dump columns in the given format. <custom> format allows $column$
-     *     placeholders, e.g. --format='$host$: $service$'
+     *     placeholders, e.g. --format='$host$: $service$'. This requires
+     *     that the columns are specified within the --columns parameter.
      *
      *   --<column>[=filter]
      *     Filter given column by optional filter. Boolean (1/0) columns are
      *     true if no filter value is given.
      *
+     *   --problems
+     *     Only show unhandled problems (HARD state and not acknowledged/in downtime).
+     *
+     *   --columns='<comma separated list of host/service columns>'
+     *     Add a limited set of columns to the output. The following host/service
+     *     attributes can be fetched: state, handled, output, acknowledged, in_downtime, perfdata last_state_change
+     *
      * EXAMPLES
      *
-     *   icingacli monitoring list --unhandled
+     *   icingacli monitoring list --problems
+     *   icingacli monitoring list --problems --service_state_type 0
      *   icingacli monitoring list --host=local* --service=*disk*
-     *   icingacli monitoring list --format='$host$: $service$'
+     *   icingacli monitoring list --columns 'host,service,service_output' \
+           --format='$host$: $service$ ($service_output$)'
      */
     public function statusAction()
     {
@@ -294,9 +304,9 @@ class ListCommand extends Command
             }
 
             $wrappedOutput = wordwrap(
-                    preg_replace('~\@{3,}~', '@@@', $row->service_output),
-                    $maxCols - 13
-                ) . "\n";
+                preg_replace('~\@{3,}~', '@@@', $row->service_output),
+                $maxCols - 13
+            ) . "\n";
             $out .= sprintf(
                 " %1s─ %s%s (%s)",
                 $leaf,
@@ -336,6 +346,4 @@ class ListCommand extends Command
             $last = $circle;
         }
     }
-
 }
-

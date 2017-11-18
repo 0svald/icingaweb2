@@ -3,6 +3,16 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "MIME-Version: 1.0\n"
 "Language: ru_RU\n"
+<<<<<<< HEAD
+=======
+"Project-Id-Version: \n"
+"POT-Creation-Date: \n"
+"PO-Revision-Date: \n"
+"Last-Translator: Michael Friedrich <michael.friedrich@icinga.com>\n"
+"Language-Team: \n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 2.0.3\n"
+>>>>>>> upstream/master
 
 #, php-format
 msgid "\"%s\" is not in the list of allowed values."
@@ -1685,9 +1695,12 @@ msgstr "Пароль для аутентификации"
 msgid "The password to use for querying the ldap server"
 msgstr ""
 
+<<<<<<< HEAD
 msgid "The path to your livestatus socket used for querying monitoring data"
 msgstr ""
 
+=======
+>>>>>>> upstream/master
 msgid ""
 "The path where groups can be found on the LDAP server. Leave empty to select "
 "all users available using the specified connection."
