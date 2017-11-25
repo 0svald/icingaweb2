@@ -354,6 +354,9 @@
         },
 
         refreshDebug: function () {
+            if (! this.debug) {
+                return;
+            }
 
             var size = this.getDefaultFontSize().toString();
             var winWidth = $( window ).width();
@@ -576,7 +579,7 @@
 
             if (typeof $container === 'undefined') {
                 var $header = $('#header');
-                var $headerLogo = $('#header-logo');
+                var $headerLogo = $('#header-logo-container');
                 var $main = $('#main');
                 var $search = $('#search');
                 var $sidebar = $('#sidebar');
@@ -592,8 +595,7 @@
                             display: 'none'
                         });
                         $main.css({
-                            top: $header.height() + $sidebar.outerHeight(),
-                            zIndex: 2
+                            top: $header.outerHeight() + $sidebar.outerHeight()
                         });
                         $sidebar
                             .on(
@@ -608,16 +610,14 @@
                         this.mobileMenu = true;
                     }
                 } else {
+                    $headerLogo.css({
+                        top: $header.css('height')
+                    });
                     $main.css({
-                        top: $header.css('height'),
-                        zIndex: ''
+                        top: $header.css('height')
                     });
                     $sidebar.css({
-                        top: $header.css('height'),
-                        zIndex: ''
-                    });
-                    $header.css({
-                        height: $header.height() + 'px'
+                        top: $headerLogo.offset().top + $headerLogo.outerHeight()
                     });
 
                     if (this.mobileMenu) {
@@ -654,7 +654,7 @@
                 var $controls = $(this);
                 var $fakeControls = $controls.next('.fake-controls');
                 $controls.css({
-                    top: $container.offset().top,
+                    top: $container.offsetParent().position().top,
                     width: $fakeControls.outerWidth()
                 });
                 $fakeControls.height($controls.height());
